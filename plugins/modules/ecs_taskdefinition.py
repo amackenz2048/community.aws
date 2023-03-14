@@ -708,7 +708,7 @@ class EcsTaskManager:
             return None
 
     def register_task(self, family, task_role_arn, execution_role_arn, network_mode, container_definitions,
-                      volumes, launch_type, cpu, memory, placement_constraints):
+                      volumes, launch_type, runtimePlatform, cpu, memory, placement_constraints):
         validated_containers = []
 
         # Ensures the number parameters are int as required by the AWS SDK
@@ -754,6 +754,8 @@ class EcsTaskManager:
         )
         if network_mode != 'default':
             params['networkMode'] = network_mode
+        if runtimePlatform:
+            params['runtimePlatform'] = runtimePlatform
         if cpu:
             params['cpu'] = cpu
         if memory:
@@ -822,6 +824,7 @@ def main():
         execution_role_arn=dict(required=False, default='', type='str'),
         volumes=dict(required=False, type='list', elements='dict'),
         launch_type=dict(required=False, choices=['EC2', 'FARGATE']),
+        runtimePlatform=dict(required=False, type='dict'),
         cpu=dict(),
         memory=dict(required=False, type='str'),
         placement_constraints=dict(required=False, type='list', elements='dict',
@@ -1021,6 +1024,7 @@ def main():
                                                                    module.params['containers'],
                                                                    volumes,
                                                                    module.params['launch_type'],
+                                                                   module.params['runtimePlatform'],
                                                                    module.params['cpu'],
                                                                    module.params['memory'],
                                                                    module.params['placement_constraints'],)
