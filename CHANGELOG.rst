@@ -5,6 +5,360 @@ community.aws Release Notes
 .. contents:: Topics
 
 
+v5.3.0
+======
+
+Release Summary
+---------------
+
+This release brings some minor changes, bugfixes and deprecations.
+
+Minor Changes
+-------------
+
+- aws_ssm - added support for specifying the endpoint to use when connecting to the S3 API (https://github.com/ansible-collections/community.aws/pull/1619).
+- aws_ssm - remove unused imports (https://github.com/ansible-collections/community.aws/pull/1707).
+- aws_ssm - rework environment variable handling to use built in Ansible plugin support (https://github.com/ansible-collections/community.aws/pull/514).
+- batch_job_definition - make trailing comma tuple explicitly a tuple (https://github.com/ansible-collections/community.aws/pull/1707).
+- ecs_service - ``task_definition`` is now optional when ``force_new_deployment`` is ``True`` (https://github.com/ansible-collections/community.aws/pull/1680).
+- ecs_service - new parameter ``purge_placement_constraints``  to have the ability to remove the placement constraints of an ECS Service (https://github.com/ansible-collections/community.aws/pull/1716).
+- ecs_service - new parameter ``purge_placement_strategy`` to have the ability to remove the placement strategy of an ECS Service (https://github.com/ansible-collections/community.aws/pull/1716).
+- iam_role - added ``assume_role_policy_document_raw`` to the role return values, this doesn't convert policy document contents from CamelCase to snake_case (https://github.com/ansible-collections/community.aws/issues/551).
+- iam_role_info - added ``assume_role_policy_document_raw`` to the role return values, this doesn't convert policy document contents from CamelCase to snake_case (https://github.com/ansible-collections/community.aws/issues/551).
+- inspector_target - minor linting fix (https://github.com/ansible-collections/community.aws/pull/1707).
+- s3_lifecycle - add parameter ``noncurrent_version_keep_newer`` to set the number of newest noncurrent versions to retain (https://github.com/ansible-collections/community.aws/pull/1606).
+- secretsmanager_secret - added support for region replication using the ``replica`` parameter (https://github.com/ansible-collections/community.aws/pull/827).
+- secretsmanager_secret - added the ``overwrite`` parameter to support only setting the secret if it doesn't exist (https://github.com/ansible-collections/community.aws/pull/1628).
+- sns_topic - add support for ``content_based_deduplication`` parameter (https://github.com/ansible-collections/community.aws/pull/1693).
+- sns_topic - add support for ``tags`` and ``purge_tags`` (https://github.com/ansible-collections/community.aws/pull/972).
+- sqs_queue - add support for ``deduplication_scope`` parameter (https://github.com/ansible-collections/community.aws/pull/1603).
+- sqs_queue - add support for ``fifo_throughput_limit`` parameter (https://github.com/ansible-collections/community.aws/pull/1603).
+- ssm_parameter - add support for tags in ssm parameters (https://github.com/ansible-collections/community.aws/issues/1573).
+
+Deprecated Features
+-------------------
+
+- ecs_service -  In a release after 2024-06-01, tha default value of ``purge_placement_constraints`` will be change from ``false`` to ``true`` (https://github.com/ansible-collections/community.aws/pull/1716).
+- ecs_service -  In a release after 2024-06-01, tha default value of ``purge_placement_strategy`` will be change from ``false`` to ``true`` (https://github.com/ansible-collections/community.aws/pull/1716).
+- iam_role - All top level return values other than ``iam_role`` and ``changed`` have been deprecated and will be removed in a release after 2023-12-01 (https://github.com/ansible-collections/community.aws/issues/551).
+- iam_role - In a release after 2023-12-01 the contents of ``assume_role_policy_document`` will no longer be converted from CamelCase to snake_case.  The ``assume_role_policy_document_raw`` return value already returns the policy document in this future format (https://github.com/ansible-collections/community.aws/issues/551).
+- iam_role_info - In a release after 2023-12-01 the contents of ``assume_role_policy_document`` will no longer be converted from CamelCase to snake_case.  The ``assume_role_policy_document_raw`` return value already returns the policy document in this future format (https://github.com/ansible-collections/community.aws/issues/551).
+
+Bugfixes
+--------
+
+- aws_ssm - fix copying empty file with older curl versions (https://github.com/ansible-collections/community.aws/issues/1686).
+- eks_cluster - adding tags to eks cluster creation (https://github.com/ansible-collections/community.aws/pull/1591).
+- sns_topic - avoid fetching attributes from subscribers when not setting them, this can cause permissions issues (https://github.com/ansible-collections/community.aws/pull/1418).
+
+New Modules
+-----------
+
+- eks_nodegroup - Manage EKS Nodegroup module
+
+v5.2.0
+======
+
+Release Summary
+---------------
+
+A minor release containing bugfixes for the ``aws_ssm`` connection
+plugin and the ``ecs_service``, ``s3_lifecycle`` and  ``ssm_parameter``
+modules.
+As well as improvements to the ``ecs_cluster``, ``ec2_ecr``,
+``ecs_service``, ``iam_role`` and ``ssm_parameter`` plugins.
+
+
+Minor Changes
+-------------
+
+- aws_ssm - add ``ansible_aws_ssm_s3_addressing_style`` to allow setting the S3 addressing style (https://github.com/ansible-collections/community.aws/pull/1633).
+- aws_ssm - add support for custom SSM documents (https://github.com/ansible-collections/community.aws/pull/876).
+- aws_ssm - avoid overloading ``subprocess`` (https://github.com/ansible-collections/community.aws/pull/1660).
+- aws_ssm - cleanup logging output (https://github.com/ansible-collections/community.aws/pull/1660).
+- aws_ssm - minor refactoring (https://github.com/ansible-collections/community.aws/pull/1660).
+- aws_ssm - refactor boto3 client initialization (https://github.com/ansible-collections/community.aws/pull/1663).
+- aws_ssm - refactor remote command generation (https://github.com/ansible-collections/community.aws/pull/1664).
+- ecs_cluster - add support for ``capacity_providers`` and ``capacity_provider_strategy`` features (https://github.com/ansible-collections/community.aws/pull/1640).
+- ecs_cluster - append default value to documentation (https://github.com/ansible-collections/community.aws/pull/1636).
+- ecs_ecr - add ``encryption_configuration`` option (https://github.com/ansible-collections/community.aws/pull/1623).
+- ecs_service - support load balancer update for existing ECS services (https://github.com/ansible-collections/community.aws/pull/1625).
+- iam_role - Drop deprecation warning, because the standard value for purge parameters is ``true`` (https://github.com/ansible-collections/community.aws/pull/1636).
+- ssm_parameter - fix typo in examples ``paramater`` (https://github.com/ansible-collections/community.aws/issues/1642).
+
+Bugfixes
+--------
+
+- aws_ssm - fix ``invalid literal for int`` error on some operating systems (https://github.com/ansible-collections/community.aws/issues/113).
+- aws_ssm - fixes bug with presigned S3 URLs in post-2019 AWS regions (https://github.com/ansible-collections/community.aws/issues/1616).
+- ecs_service - respect ``placement_constraints`` for existing ECS services (https://github.com/ansible-collections/community.aws/pull/1601).
+- s3_lifecycle - module no longer calls ``put_lifecycle_configuration`` if there is no change (https://github.com/ansible-collections/community.aws/issues/1624).
+- ssm_parameter - fix a ``KeyError`` when adding a description to an existing parameter (https://github.com/ansible-collections/community.aws/issues/1471).
+
+v5.1.0
+======
+
+Release Summary
+---------------
+
+This is the minor release of the ``community.aws`` collection.
+This changelog contains all changes to the modules and plugins in this collection
+that have been made after the previous release.
+
+Minor Changes
+-------------
+
+- elasticache_parameter_group - add ``redis6.x`` group family on the module input choices (https://github.com/ansible-collections/community.aws/pull/1476).
+- elb_target_group - add support for ``protocol_version`` parameter (https://github.com/ansible-collections/community.aws/pull/1496).
+
+Bugfixes
+--------
+
+- aws_ssm - fixes S3 bucket region detection by ensuring boto client has correct credentials and exists in correct partition (https://github.com/ansible-collections/community.aws/pull/1428).
+- ec2_snapshot_copy - including tags caused the erorr "Tag specification resource type must have a value". Fix sets the ResourceType to snapshot to resolve this issue (https://github.com/ansible-collections/community.aws/pull/1419).
+- ecs_ecr - fix a ``RepositoryNotFound`` exception when trying to create repositories in check mode (https://github.com/ansible-collections/community.aws/pull/1550).
+- opensearch - Fix cluster creation when using advanced security options (https://github.com/ansible-collections/community.aws/pull/1613).
+
+v5.0.0
+======
+
+Release Summary
+---------------
+
+In this release many community modules have been promoted to Red Hat
+supported status. Those modules have been moved from the commuity.aws to amazon.aws
+collection.
+
+The community.aws collection has dropped support for ``botocore<1.21.0`` and ``boto3<1.18.0``.
+Support for ``ansible-core<2.11`` has also been dropped.
+
+This release also brings some new features, bugfixes, breaking changes and deprecated features.
+
+
+Minor Changes
+-------------
+
+- acm_certificate - Move to jittered backoff (https://github.com/ansible-collections/amazon.aws/pull/946).
+- acm_certificate_info - Move to jittered backoff (https://github.com/ansible-collections/amazon.aws/pull/946).
+- api_gateway_domain - Move to jittered backoff (https://github.com/ansible-collections/community.aws/pull/1386).
+- autoscaling_group_info - minor sanity test fixes (https://github.com/ansible-collections/community.aws/pull/1410).
+- aws_acm - the ``aws_acm`` module has been renamed to ``acm_certificate``, ``aws_acm`` remains as an alias (https://github.com/ansible-collections/community.aws/pull/1263).
+- aws_acm_info - the ``aws_acm_info`` module has been renamed to ``acm_certificate_info``, ``aws_acm_info`` remains as an alias (https://github.com/ansible-collections/community.aws/pull/1263).
+- aws_api_gateway - the ``aws_api_gateway`` module has been renamed to ``api_gateway``, ``aws_api_gateway`` remains as an alias (https://github.com/ansible-collections/community.aws/pull/1288).
+- aws_api_gateway_domain - the ``aws_api_gateway_domain`` module has been renamed to ``api_gateway_domain``, ``aws_api_gateway_domain`` remains as an alias (https://github.com/ansible-collections/community.aws/pull/1288).
+- aws_application_scaling_policy - the ``aws_application_scaling_policy`` module has been renamed to ``application_autoscaling_policy``, ``aws_application_scaling_policy`` remains as an alias (https://github.com/ansible-collections/community.aws/pull/1314).
+- aws_batch_compute_environment - the ``aws_batch_compute_environment`` module has been renamed to ``batch_compute_environment``, ``aws_batch_compute_environment`` remains as an alias (https://github.com/ansible-collections/community.aws/pull/1272).
+- aws_batch_job_definition - the ``aws_batch_job_definition`` module has been renamed to ``batch_job_definition``, ``aws_batch_job_definition`` remains as an alias (https://github.com/ansible-collections/community.aws/pull/1272).
+- aws_batch_job_queue - the ``aws_batch_job_queue`` module has been renamed to ``batch_job_queue``, ``aws_batch_job_queue`` remains as an alias (https://github.com/ansible-collections/community.aws/pull/1272).
+- aws_codebuild - the ``aws_codebuild`` module has been renamed to ``codebuild_project``, ``aws_codebuild`` remains as an alias (https://github.com/ansible-collections/community.aws/pull/1308).
+- aws_codecommit - the ``aws_codecommit`` module has been renamed to ``codecommit_repository``, ``aws_codecommit`` remains as an alias (https://github.com/ansible-collections/community.aws/pull/1308).
+- aws_codepipeline - the ``aws_codepipeline`` module has been renamed to ``codepipeline``, ``aws_codepipeline`` remains as an alias (https://github.com/ansible-collections/community.aws/pull/1308).
+- aws_config_aggregation_authorization - the ``aws_config_aggregation_authorization`` module has been renamed to ``config_aggregation_authorization``, ``aws_config_aggregation_authorization`` remains as an alias (https://github.com/ansible-collections/community.aws/pull/1305).
+- aws_config_aggregator - the ``aws_config_aggregator`` module has been renamed to ``config_aggregator``, ``aws_config_aggregator`` remains as an alias (https://github.com/ansible-collections/community.aws/pull/1305).
+- aws_config_delivery_channel - the ``aws_config_delivery_channel`` module has been renamed to ``config_delivery_channel``, ``aws_config_delivery_channel`` remains as an alias (https://github.com/ansible-collections/community.aws/pull/1305).
+- aws_config_recorder - the ``aws_config_recorder`` module has been renamed to ``config_recorder``, ``aws_config_recorder`` remains as an alias (https://github.com/ansible-collections/community.aws/pull/1305).
+- aws_config_rule - the ``aws_config_rule`` module has been renamed to ``config_rule``, ``aws_config_rule`` remains as an alias (https://github.com/ansible-collections/community.aws/pull/1305).
+- aws_direct_connect_confirm_connection - the ``aws_direct_connect_confirm_connection`` module has been renamed to ``directconnect_confirm_connection``, ``aws_direct_connect_confirm_connection`` remains as an alias (https://github.com/ansible-collections/community.aws/pull/1286).
+- aws_direct_connect_connection - the ``aws_direct_connect_connection`` module has been renamed to ``directconnect_connection``, ``aws_direct_connect_connection`` remains as an alias (https://github.com/ansible-collections/community.aws/pull/1286).
+- aws_direct_connect_gateway - the ``aws_direct_connect_gateway`` module has been renamed to ``directconnect_gateway``, ``aws_direct_connect_gateway`` remains as an alias (https://github.com/ansible-collections/community.aws/pull/1286).
+- aws_direct_connect_link_aggregation_group - the ``aws_direct_connect_link_aggregation_group`` module has been renamed to ``directconnect_link_aggregation_group``, ``aws_direct_connect_link_aggregation_group`` remains as an alias (https://github.com/ansible-collections/community.aws/pull/1286).
+- aws_direct_connect_virtual_interface - the ``aws_direct_connect_virtual_interface`` module has been renamed to ``directconnect_virtual_interface``, ``aws_direct_connect_virtual_interface`` remains as an alias (https://github.com/ansible-collections/community.aws/pull/1286).
+- aws_eks_cluster - the ``aws_eks_cluster`` module has been renamed to ``eks_cluster``, ``aws_eks_cluster`` remains as an alias (https://github.com/ansible-collections/community.aws/pull/1269).
+- aws_glue_connection - the ``aws_glue_connection`` module has been renamed to ``glue_connection``, ``aws_glue_connection`` remains as an alias (https://github.com/ansible-collections/community.aws/pull/1300).
+- aws_glue_crawler - the ``aws_glue_crawler`` module has been renamed to ``glue_crawler``, ``aws_glue_crawler`` remains as an alias (https://github.com/ansible-collections/community.aws/pull/1300).
+- aws_glue_job - the ``aws_glue_job`` module has been renamed to ``glue_job``, ``aws_glue_job`` remains as an alias (https://github.com/ansible-collections/community.aws/pull/1300).
+- aws_inspector_target - the ``aws_inspector_target`` module has been renamed to ``inspector_target``, ``aws_inspector_target`` remains as an alias (https://github.com/ansible-collections/community.aws/pull/1318).
+- aws_kms - the ``aws_kms`` module has been renamed to ``kms_key``, ``aws_kms`` remains as an alias (https://github.com/ansible-collections/community.aws/pull/1284).
+- aws_kms_info - the ``aws_kms_info`` module has been renamed to ``kms_key_info``, ``aws_kms_info`` remains as an alias (https://github.com/ansible-collections/community.aws/pull/1284).
+- aws_msk_cluster - the ``aws_msk_cluster`` module has been renamed to ``msk_cluster``, ``aws_msk_cluster`` remains as an alias (https://github.com/ansible-collections/community.aws/pull/1311).
+- aws_msk_config - the ``aws_msk_config`` module has been renamed to ``msk_config``, ``aws_msk_config`` remains as an alias (https://github.com/ansible-collections/community.aws/pull/1311).
+- aws_s3_bucket_info - the ``aws_s3_bucket_info`` module has been renamed to ``s3_bucket_info``, ``aws_s3_bucket_info`` remains as an alias (https://github.com/ansible-collections/community.aws/pull/1271).
+- aws_s3_cors - the ``aws_s3_cors`` module has been renamed to ``s3_cors``, ``aws_s3_cors`` remains as an alias (https://github.com/ansible-collections/community.aws/pull/1271).
+- aws_secret - the ``aws_secret`` module has been renamed to ``secretsmanager_secret``, ``aws_secret`` remains as an alias (https://github.com/ansible-collections/community.aws/pull/1315).
+- aws_ses_identity - the ``aws_ses_identity`` module has been renamed to ``ses_identity``, ``aws_ses_identity`` remains as an alias (https://github.com/ansible-collections/community.aws/pull/1264).
+- aws_ses_identity_policy - the ``aws_ses_identity_policy`` module has been renamed to ``ses_identity_policy``, ``aws_ses_identity_policy`` remains as an alias (https://github.com/ansible-collections/community.aws/pull/1264).
+- aws_ses_rule_set - the ``aws_ses_rule_set`` module has been renamed to ``ses_rule_set``, ``aws_ses_rule_set`` remains as an alias (https://github.com/ansible-collections/community.aws/pull/1264).
+- aws_sgw_info - the ``aws_sgw_info`` module has been renamed to ``storagegateway_info``, ``aws_sgw_info`` remains as an alias (https://github.com/ansible-collections/community.aws/pull/1301).
+- aws_ssm_parameter_store - the ``aws_ssm_parameter_store`` module has been renamed to ``ssm_parameter``, ``aws_ssm_parameter_store`` remains as an alias (https://github.com/ansible-collections/community.aws/pull/1313).
+- aws_step_functions_state_machine - the ``aws_step_functions_state_machine`` module has been renamed to ``stepfunctions_state_machine``, ``aws_step_functions_state_machine`` remains as an alias (https://github.com/ansible-collections/community.aws/pull/1310).
+- aws_step_functions_state_machine_execution - the ``aws_step_functions_state_machine_execution`` module has been renamed to ``stepfunctions_state_machine_execution``, ``aws_step_functions_state_machine_execution`` remains as an alias (https://github.com/ansible-collections/community.aws/pull/1310).
+- aws_waf_condition - the ``aws_waf_condition`` module has been renamed to ``waf_condition``, ``aws_waf_condition`` remains as an alias (https://github.com/ansible-collections/community.aws/pull/1299).
+- aws_waf_info - the ``aws_waf_info`` module has been renamed to ``waf_info``, ``aws_waf_info`` remains as an alias (https://github.com/ansible-collections/community.aws/pull/1299).
+- aws_waf_rule - the ``aws_waf_rule`` module has been renamed to ``waf_rule``, ``aws_waf_rule`` remains as an alias (https://github.com/ansible-collections/community.aws/pull/1299).
+- aws_waf_web_acl - the ``aws_waf_web_acl`` module has been renamed to ``waf_web_acl``, ``aws_waf_web_acl`` remains as an alias (https://github.com/ansible-collections/community.aws/pull/1299).
+- cloudfront_distribution - minor sanity test fixes (https://github.com/ansible-collections/community.aws/pull/1410).
+- cloudfront_info - the ``cloudfront_info`` module has been renamed to ``cloudfront_distribution_info``, ``cloudfront_info`` remains as an alias (https://github.com/ansible-collections/community.aws/pull/1352).
+- cloudfront_origin_access_identity - minor sanity test fixes (https://github.com/ansible-collections/community.aws/pull/1410).
+- cloudtrail - minor sanity test fixes (https://github.com/ansible-collections/community.aws/pull/1410).
+- community.aws modules - the ``ec2_url`` parameter has been renamed to ``endpoint_url`` for consistency, ``ec2_url`` remains as an alias (https://github.com/ansible-collections/amazon.aws/pull/992).
+- ec2_asg - the ``ec2_asg`` module has been renamed to ``autoscaling_group``, ``ec2_asg`` remains as an alias (https://github.com/ansible-collections/community.aws/pull/1294).
+- ec2_asg_info - the ``ec2_asg_info`` module has been renamed to ``autoscaling_group_info``, ``ec2_asg_info`` remains as an alias (https://github.com/ansible-collections/community.aws/pull/1294).
+- ec2_asg_instance_refresh - the ``ec2_asg_instance_refresh`` module has been renamed to ``autoscaling_instance_refresh``, ``ec2_asg_instance_refresh`` remains as an alias (https://github.com/ansible-collections/community.aws/pull/1294).
+- ec2_asg_instance_refresh_info - the ``ec2_asg_instance_refresh_info`` module has been renamed to ``autoscaling_instance_refresh_info``, ``ec2_asg_instance_refresh_info`` remains as an alias (https://github.com/ansible-collections/community.aws/pull/1294).
+- ec2_asg_lifecycle_hook - the ``ec2_asg_lifecycle_hook`` module has been renamed to ``autoscaling_lifecycle_hool``, ``ec2_asg_lifecycle_hook`` remains as an alias (https://github.com/ansible-collections/community.aws/pull/1294).
+- ec2_asg_scheduled_action - the ``ec2_asg_scheduled_action`` module has been renamed to ``autoscaling_scheduled_action``, ``ec2_asg_scheduled_action`` remains as an alias (https://github.com/ansible-collections/community.aws/pull/1294).
+- ec2_lc - the ``ec2_lc`` module has been renamed to ``autoscaling_launch_config``, ``ec2_lc`` remains as an alias (https://github.com/ansible-collections/community.aws/pull/1294).
+- ec2_lc_find - the ``ec2_lc_find`` module has been renamed to ``autoscaling_launch_config_find``, ``ec2_lc_find`` remains as an alias (https://github.com/ansible-collections/community.aws/pull/1294).
+- ec2_lc_info - the ``ec2_lc_info`` module has been renamed to ``autoscaling_launch_config_info``, ``ec2_lc_info`` remains as an alias (https://github.com/ansible-collections/community.aws/pull/1294).
+- ec2_metric_alarm - the ``ec2_metric_alarm`` module has been renamed to ``cloudwatch_metric_alarm``, ``ec2_metric_alarm`` remains as an alias (https://github.com/ansible-collections/community.aws/pull/1304).
+- ec2_scaling_policy - the ``ec2_scaling_policy`` module has been renamed to ``autoscaling_policy``, ``ec2_scaling_policy`` remains as an alias (https://github.com/ansible-collections/community.aws/pull/1294).
+- ec2_vpc_nacl - minor sanity test fixes (https://github.com/ansible-collections/community.aws/pull/1410).
+- ec2_vpc_vpn - minor tweak to ``VPNConnectionException`` to pass message through to the superclass (https://github.com/ansible-collections/community.aws/pull/1407).
+- eks_fargate_profile - minor sanity test fixes (https://github.com/ansible-collections/community.aws/pull/1410).
+- elb_target_group - instead of completely ignoring ``health_check_path`` and ``successful_response_codes`` if ``health_check_protocol`` is not supplied, now raises an error (https://github.com/ansible-collections/community.aws/issues/29).
+- redshift - minor sanity test fixes (https://github.com/ansible-collections/community.aws/pull/1410).
+- s3_bucket_info - minor sanity test fixes (https://github.com/ansible-collections/community.aws/pull/1410).
+- waf_condition - Move to jittered backoff (https://github.com/ansible-collections/amazon.aws/pull/946).
+- waf_info - Move to jittered backoff (https://github.com/ansible-collections/amazon.aws/pull/946).
+- waf_rule - Move to jittered backoff (https://github.com/ansible-collections/amazon.aws/pull/946).
+- waf_web_acl - Move to jittered backoff (https://github.com/ansible-collections/amazon.aws/pull/946).
+
+Breaking Changes / Porting Guide
+--------------------------------
+
+- acm_certificate - the previously deprecated default value of ``purge_tags=False`` has been updated to ``purge_tags=True`` (https://github.com/ansible-collections/community.aws/pull/1343).
+- autoscaling_group - The module has been migrated from the ``community.aws`` collection. Playbooks using the Fully Qualified Collection Name for this module should be updated to use ``amazon.aws.autoscaling_group``.
+- autoscaling_group_info - The module has been migrated from the ``community.aws`` collection. Playbooks using the Fully Qualified Collection Name for this module should be updated to use ``amazon.aws.autoscaling_group_info``.
+- cloudfront_distribution - the previously deprecated default value of ``purge_tags=False`` has been updated to ``purge_tags=True`` (https://github.com/ansible-collections/community.aws/pull/1343).
+- cloudtrail - The module has been migrated to the ``amazon.aws`` collection. Playbooks using the Fully Qualified Collection Name for this module should be updated to use ``amazon.aws.cloudtrail``.
+- cloudwatch_metric_alarm - The module has been migrated from the ``community.aws`` collection. Playbooks using the Fully Qualified Collection Name for this module should be updated to use ``amazon.aws.cloudwatch_metric_alarm``.
+- cloudwatchevent_rule - The module has been migrated from the ``community.aws`` collection. Playbooks using the Fully Qualified Collection Name for this module should be updated to use ``amazon.aws.cloudwatchevent_rule``.
+- cloudwatchlogs_log_group - The module has been migrated from the ``community.aws`` collection. Playbooks using the Fully Qualified Collection Name for this module should be updated to use ``amazon.aws.cloudwatchlogs_log_group``.
+- cloudwatchlogs_log_group_info - The module has been migrated from the ``community.aws`` collection. Playbooks using the Fully Qualified Collection Name for this module should be updated to use ``amazon.aws.cloudwatchlogs_log_group_info``.
+- cloudwatchlogs_log_group_metric_filter - The module has been migrated from the ``community.aws`` collection. Playbooks using the Fully Qualified Collection Name for this module should be updated to use ``amazon.aws.cloudwatchlogs_log_group_metric_filter``.
+- community.aws collection - Support for ansible-core < 2.11 has been dropped (https://github.com/ansible-collections/community.aws/pull/1541).
+- community.aws collection - The community.aws collection has dropped support for ``botocore<1.21.0`` and ``boto3<1.18.0``. Most modules will continue to work with older versions of the AWS SDK, however compatibility with older versions of the SDK is not guaranteed and will not be tested. When using older versions of the SDK a warning will be emitted by Ansible (https://github.com/ansible-collections/community.aws/pull/1362).
+- ec2_eip - The module has been migrated from the ``community.aws`` collection. Playbooks using the Fully Qualified Collection Name for this module should be updated to use ``amazon.aws.ec2_eip``.
+- ec2_eip_info - The module has been migrated from the ``community.aws`` collection. Playbooks using the Fully Qualified Collection Name for this module should be updated to use ``amazon.aws.ec2_eip_info``.
+- ec2_vpc_vpn - the previously deprecated default value of ``purge_tags=False`` has been updated to ``purge_tags=True`` (https://github.com/ansible-collections/community.aws/pull/1343).
+- elb_application_lb - The module has been migrated from the ``community.aws`` collection. Playbooks using the Fully Qualified Collection Name for this module should be updated to use ``amazon.aws.elb_application_lb``.
+- elb_application_lb_info - The module has been migrated from the ``community.aws`` collection. Playbooks using the Fully Qualified Collection Name for this module should be updated to use ``amazon.aws.elb_application_lb_info``.
+- execute_lambda - The module has been migrated from the ``community.aws`` collection. Playbooks using the Fully Qualified Collection Name for this module should be updated to use ``amazon.aws.execute_lambda``.
+- iam_policy - The module has been migrated from the ``community.aws`` collection. Playbooks using the Fully Qualified Collection Name for this module should be updated to use ``amazon.aws.iam_policy``.
+- iam_policy_info - The module has been migrated from the ``community.aws`` collection. Playbooks using the Fully Qualified Collection Name for this module should be updated to use ``amazon.aws.iam_policy_info``.
+- iam_server_certificate - Passing file names to the ``cert``, ``chain_cert`` and ``key`` parameters has been removed. We recommend using a lookup plugin to read the files instead, see the documentation for an example (https://github.com/ansible-collections/community.aws/pull/1265).
+- iam_server_certificate - the default value for the ``dup_ok`` parameter has been changed to ``true``. To preserve the original behaviour explicitly set the ``dup_ok`` parameter to ``false`` (https://github.com/ansible-collections/community.aws/pull/1265).
+- iam_user - The module has been migrated from the ``community.aws`` collection. Playbooks using the Fully Qualified Collection Name for this module should be updated to use ``amazon.aws.iam_user``.
+- iam_user_info - The module has been migrated from the ``community.aws`` collection. Playbooks using the Fully Qualified Collection Name for this module should be updated to use ``amazon.aws.iam_user_info``.
+- kms_key - The module has been migrated from the ``community.aws`` collection. Playbooks using the Fully Qualified Collection Name for this module should be updated to use ``amazon.aws.kms_key``.
+- kms_key - managing the KMS IAM Policy via ``policy_mode`` and ``policy_grant_types`` was previously deprecated and has been removed in favor of the ``policy`` option (https://github.com/ansible-collections/community.aws/pull/1344).
+- kms_key - the previously deprecated default value of ``purge_tags=False`` has been updated to ``purge_tags=True`` (https://github.com/ansible-collections/community.aws/pull/1343).
+- kms_key_info - The module has been migrated from the ``community.aws`` collection. Playbooks using the Fully Qualified Collection Name for this module should be updated to use ``amazon.aws.kms_key_info``.
+- lambda - The module has been migrated from the ``community.aws`` collection. Playbooks using the Fully Qualified Collection Name for this module should be updated to use ``amazon.aws.lambda``.
+- lambda_alias - The module has been migrated from the ``community.aws`` collection. Playbooks using the Fully Qualified Collection Name for this module should be updated to use ``amazon.aws.lambda_alias``.
+- lambda_event - The module has been migrated from the ``community.aws`` collection. Playbooks using the Fully Qualified Collection Name for this module should be updated to use ``amazon.aws.lambda_event``.
+- lambda_execute - The module has been migrated from the ``community.aws`` collection. Playbooks using the Fully Qualified Collection Name for this module should be updated to use ``amazon.aws.lambda_execute``.
+- lambda_info - The module has been migrated from the ``community.aws`` collection. Playbooks using the Fully Qualified Collection Name for this module should be updated to use ``amazon.aws.lambda_info``.
+- lambda_policy - The module has been migrated from the ``community.aws`` collection. Playbooks using the Fully Qualified Collection Name for this module should be updated to use ``amazon.aws.lambda_policy``.
+- rds_cluster - The module has been migrated from the ``community.aws`` collection. Playbooks using the Fully Qualified Collection Name for this module should be updated to use ``amazon.aws.rds_cluster``.
+- rds_cluster_info - The module has been migrated from the ``community.aws`` collection. Playbooks using the Fully Qualified Collection Name for this module should be updated to use ``amazon.aws.rds_cluster_info``.
+- rds_cluster_snapshot - The module has been migrated from the ``community.aws`` collection. Playbooks using the Fully Qualified Collection Name for this module should be updated to use ``amazon.aws.rds_cluster_snapshot``.
+- rds_instance - The module has been migrated from the ``community.aws`` collection. Playbooks using the Fully Qualified Collection Name for this module should be updated to use ``amazon.aws.rds_instance``.
+- rds_instance_info - The module has been migrated from the ``community.aws`` collection. Playbooks using the Fully Qualified Collection Name for this module should be updated to use ``amazon.aws.rds_instance_info``.
+- rds_instance_snapshot - The module has been migrated from the ``community.aws`` collection. Playbooks using the Fully Qualified Collection Name for this module should be updated to use ``amazon.aws.rds_instance_snapshot``.
+- rds_option_group - The module has been migrated from the ``community.aws`` collection. Playbooks using the Fully Qualified Collection Name for this module should be updated to use ``amazon.aws.rds_option_group``.
+- rds_option_group_info - The module has been migrated from the ``community.aws`` collection. Playbooks using the Fully Qualified Collection Name for this module should be updated to use ``amazon.aws.rds_option_group_info``.
+- rds_param_group - The module has been migrated from the ``community.aws`` collection. Playbooks using the Fully Qualified Collection Name for this module should be updated to use ``amazon.aws.rds_param_group``.
+- rds_param_group - the previously deprecated default value of ``purge_tags=False`` has been updated to ``purge_tags=True`` (https://github.com/ansible-collections/community.aws/pull/1343).
+- rds_snapshot_info - The module has been migrated from the ``community.aws`` collection. Playbooks using the Fully Qualified Collection Name for this module should be updated to use ``amazon.aws.rds_snapshot_info``.
+- rds_subnet_group - The module has been migrated from the ``community.aws`` collection. Playbooks using the Fully Qualified Collection Name for this module should be updated to use ``amazon.aws.rds_subnet_group``.
+- route53 - The module has been migrated from the ``community.aws`` collection. Playbooks using the Fully Qualified Collection Name for this module should be updated to use ``amazon.aws.route53``.
+- route53_health_check - The module has been migrated from the ``community.aws`` collection. Playbooks using the Fully Qualified Collection Name for this module should be updated to use ``amazon.aws.route53_health_check``.
+- route53_health_check - the previously deprecated default value of ``purge_tags=False`` has been updated to ``purge_tags=True`` (https://github.com/ansible-collections/community.aws/pull/1343).
+- route53_info - The module has been migrated from the ``community.aws`` collection. Playbooks using the Fully Qualified Collection Name for this module should be updated to use ``amazon.aws.route53_info``.
+- route53_zone - The module has been migrated from the ``community.aws`` collection. Playbooks using the Fully Qualified Collection Name for this module should be updated to use ``amazon.aws.route53_zone``.
+- route53_zone - the previously deprecated default value of ``purge_tags=False`` has been updated to ``purge_tags=True`` (https://github.com/ansible-collections/community.aws/pull/1343).
+- sqs_queue - the previously deprecated default value of ``purge_tags=False`` has been updated to ``purge_tags=True`` (https://github.com/ansible-collections/community.aws/pull/1343).
+
+Deprecated Features
+-------------------
+
+- community.aws collection - due to the AWS SDKs announcing the end of support for Python less than 3.7 (https://aws.amazon.com/blogs/developer/python-support-policy-updates-for-aws-sdks-and-tools/) support for Python less than 3.7 by this collection has been deprecated and will be removed in a release after 2023-05-31 (https://github.com/ansible-collections/community.aws/pull/1361).
+
+Bugfixes
+--------
+
+- ec2_placement_group - Handle a potential race creation during the creation of a new Placement Group (https://github.com/ansible-collections/community.aws/pull/1477).
+- elb_network_lb - fixes bug where ``ip_address_type`` in return value was not updated (https://github.com/ansible-collections/community.aws/pull/1365).
+- rds_cluster - fixes bug where specifiying an rds cluster parameter group raises a `KeyError` (https://github.com/ansible-collections/community.aws/pull/1417).
+- s3_sync - fix etag generation when running in FIPS mode (https://github.com/ansible-collections/community.aws/issues/757).
+
+New Modules
+-----------
+
+- accessanalyzer_validate_policy_info - Performs validation of IAM policies
+
+v4.5.0
+======
+
+Release Summary
+---------------
+
+This is the minor release of the ``community.aws`` collection.
+
+Minor Changes
+-------------
+
+- ecs_service - support load balancer update for existing ecs services(https://github.com/ansible-collections/community.aws/pull/1625).
+- iam_role - Drop deprecation warning, because the standard value for purge parametes is ``true`` (https://github.com/ansible-collections/community.aws/pull/1636).
+
+Bugfixes
+--------
+
+- aws_ssm - fix ``invalid literal for int`` error on some operating systems (https://github.com/ansible-collections/community.aws/issues/113).
+- ecs_service - respect ``placement_constraints`` for existing ecs services (https://github.com/ansible-collections/community.aws/pull/1601).
+- s3_lifecycle - Module no longer calls ``put_lifecycle_configuration`` if there is no change. (https://github.com/ansible-collections/community.aws/issues/1624)
+- ssm_parameter - Fix a ``KeyError`` when adding a description to an existing parameter (https://github.com/ansible-collections/community.aws/issues/1471).
+
+v4.4.0
+======
+
+Release Summary
+---------------
+
+This is the minor release of the ``community.aws`` collection.
+This changelog contains all changes to the modules and plugins in this collection
+that have been made after the previous release.
+
+Minor Changes
+-------------
+
+- elasticache_parameter_group - add ``redis6.x`` group family on the module input choices (https://github.com/ansible-collections/community.aws/pull/1476).
+
+Bugfixes
+--------
+
+- aws_ssm - fixes S3 bucket region detection by ensuring boto client has correct credentials and exists in correct partition (https://github.com/ansible-collections/community.aws/pull/1428).
+- ecs_ecr - fix a ``RepositoryNotFound`` exception when trying to create repositories in check mode (https://github.com/ansible-collections/community.aws/pull/1550).
+- opensearch - Fix cluster creation when using advanced security options (https://github.com/ansible-collections/community.aws/pull/1613).
+
+v4.3.0
+======
+
+Release Summary
+---------------
+
+The community.aws 4.3.0 release includes a number of minor bug fixes and improvements.
+Following the release of amazon.aws 5.0.0, backports to the 4.x series will be limited to security issues and bugfixes.
+
+Minor Changes
+-------------
+
+- autoscaling_group_info - minor sanity test fixes (https://github.com/ansible-collections/community.aws/pull/1410).
+- cloudfront_distribution - minor sanity test fixes (https://github.com/ansible-collections/community.aws/pull/1410).
+- cloudfront_origin_access_identity - minor sanity test fixes (https://github.com/ansible-collections/community.aws/pull/1410).
+- cloudtrail - minor sanity test fixes (https://github.com/ansible-collections/community.aws/pull/1410).
+- ec2_vpc_nacl - minor sanity test fixes (https://github.com/ansible-collections/community.aws/pull/1410).
+- eks_fargate_profile - minor sanity test fixes (https://github.com/ansible-collections/community.aws/pull/1410).
+- redshift - minor sanity test fixes (https://github.com/ansible-collections/community.aws/pull/1410).
+- s3_bucket_info - minor sanity test fixes (https://github.com/ansible-collections/community.aws/pull/1410).
+
+Bugfixes
+--------
+
+- ec2_placement_group - Handle a potential race creation during the creation of a new Placement Group (https://github.com/ansible-collections/community.aws/pull/1477).
+- rds_cluster - fixes bug where specifiying an rds cluster parameter group raises a `KeyError` (https://github.com/ansible-collections/community.aws/pull/1417).
+
 v4.2.0
 ======
 
@@ -91,7 +445,7 @@ v4.0.0
 Major Changes
 -------------
 
-- community.aws collection - The amazon.aws collection has dropped support for ``botocore<1.20.0`` and ``boto3<1.17.0``. Most modules will continue to work with older versions of the AWS SDK, however compatability with older versions of the SDK is not guaranteed and will not be tested. When using older versions of the SDK a warning will be emitted by Ansible (https://github.com/ansible-collections/community.aws/pull/956).
+- community.aws collection - The amazon.aws collection has dropped support for ``botocore<1.20.0`` and ``boto3<1.17.0``. Most modules will continue to work with older versions of the AWS SDK, however compatibility with older versions of the SDK is not guaranteed and will not be tested. When using older versions of the SDK a warning will be emitted by Ansible (https://github.com/ansible-collections/community.aws/pull/956).
 
 Minor Changes
 -------------
@@ -525,7 +879,7 @@ v3.0.0
 Major Changes
 -------------
 
-- community.aws collection - The community.aws collection has dropped support for ``botocore<1.19.0`` and ``boto3<1.16.0``. Most modules will continue to work with older versions of the AWS SDK, however compatability with older versions of the SDK is not guaranteed and will not be tested. When using older versions of the SDK a warning will be emitted by Ansible (https://github.com/ansible-collections/community.aws/pull/809).
+- community.aws collection - The community.aws collection has dropped support for ``botocore<1.19.0`` and ``boto3<1.16.0``. Most modules will continue to work with older versions of the AWS SDK, however compatibility with older versions of the SDK is not guaranteed and will not be tested. When using older versions of the SDK a warning will be emitted by Ansible (https://github.com/ansible-collections/community.aws/pull/809).
 
 Minor Changes
 -------------
@@ -738,7 +1092,7 @@ Bugfixes
 - cloudfront_info - Switch to native boto3 paginators to fix reported bug when over 100 distributions exist (https://github.com/ansible-collections/community.aws/issues/769).
 - ec2_eip - fix bug when allocating an EIP but not associating it to a VPC (https://github.com/ansible-collections/community.aws/pull/731).
 - elb_classic_lb_info - fix empty list returned when names not defined (https://github.com/ansible-collections/community.aws/pull/693).
-- elb_instance - Python 3 compatability fix (https://github.com/ansible-collections/community.aws/issues/384).
+- elb_instance - Python 3 compatibility fix (https://github.com/ansible-collections/community.aws/issues/384).
 - iam_role_info - switch to jittered backoff to reduce rate limiting failures (https://github.com/ansible-collections/community.aws/pull/748).
 - rds_instance - Fixed issue with enabling enhanced monitoring on a pre-existing RDS instance (https://github.com/ansible-collections/community.aws/pull/747).
 - route53 - add missing set identifier in resource_record_set (https://github.com/ansible-collections/community.aws/pull/595).
@@ -760,41 +1114,41 @@ v2.0.0
 Major Changes
 -------------
 
-- community.aws collection - The community.aws collection has dropped support for ``botocore<1.18.0`` and ``boto3<1.15.0`` (https://github.com/ansible-collections/community.aws/pull/711). Most modules will continue to work with older versions of the AWS SDK, however compatability with older versions of the SDK is not guaranteed and will not be tested. When using older versions of the SDK a warning will be emitted by Ansible (https://github.com/ansible-collections/amazon.aws/pull/442).
+- community.aws collection - The community.aws collection has dropped support for ``botocore<1.18.0`` and ``boto3<1.15.0`` (https://github.com/ansible-collections/community.aws/pull/711). Most modules will continue to work with older versions of the AWS SDK, however compatibility with older versions of the SDK is not guaranteed and will not be tested. When using older versions of the SDK a warning will be emitted by Ansible (https://github.com/ansible-collections/amazon.aws/pull/442).
 
 Minor Changes
 -------------
 
-- aws_eks_cluster - Tests for compatability with older versions of the AWS SDKs have been removed (https://github.com/ansible-collections/community.aws/pull/675).
+- aws_eks_cluster - Tests for compatibility with older versions of the AWS SDKs have been removed (https://github.com/ansible-collections/community.aws/pull/675).
 - aws_kms_info - use a generator rather than list comprehension (https://github.com/ansible-collections/community.aws/pull/688).
 - aws_s3_bucket_info - added test for botocore>=1.18.11 when attempting to fetch bucket ownership controls (https://github.com/ansible-collections/community.aws/pull/682)
 - aws_ses_rule_set - use a generator rather than list comprehension (https://github.com/ansible-collections/community.aws/pull/688).
 - aws_sgw_info - ensure module runs in check_mode (https://github.com/ansible-collections/community.aws/issues/659).
 - cloudformation_exports_info - ensure module runs in check_mode (https://github.com/ansible-collections/community.aws/issues/659).
-- cloudformation_stack_set - Tests for compatability with older versions of the AWS SDKs have been removed (https://github.com/ansible-collections/community.aws/pull/675).
+- cloudformation_stack_set - Tests for compatibility with older versions of the AWS SDKs have been removed (https://github.com/ansible-collections/community.aws/pull/675).
 - cloudfront_info - ensure module runs in check_mode (https://github.com/ansible-collections/community.aws/issues/659).
 - cloudwatchevent_rule - use a generator rather than list comprehension (https://github.com/ansible-collections/community.aws/pull/688).
-- dynamodb_table - Tests for compatability with older versions of the AWS SDKs have been removed (https://github.com/ansible-collections/community.aws/pull/675).
-- dynamodb_ttl - Tests for compatability with older versions of the AWS SDKs have been removed (https://github.com/ansible-collections/community.aws/pull/675).
-- ec2_ami_copy - Tests for compatability with older versions of the AWS SDKs have been removed (https://github.com/ansible-collections/community.aws/pull/675).
-- ec2_asg - Tests for compatability with older versions of the AWS SDKs have been removed (https://github.com/ansible-collections/community.aws/pull/675).
+- dynamodb_table - Tests for compatibility with older versions of the AWS SDKs have been removed (https://github.com/ansible-collections/community.aws/pull/675).
+- dynamodb_ttl - Tests for compatibility with older versions of the AWS SDKs have been removed (https://github.com/ansible-collections/community.aws/pull/675).
+- ec2_ami_copy - Tests for compatibility with older versions of the AWS SDKs have been removed (https://github.com/ansible-collections/community.aws/pull/675).
+- ec2_asg - Tests for compatibility with older versions of the AWS SDKs have been removed (https://github.com/ansible-collections/community.aws/pull/675).
 - ec2_asg_info - ensure module runs in check_mode (https://github.com/ansible-collections/community.aws/issues/659).
-- ec2_launch_template - Tests for compatability with older versions of the AWS SDKs have been removed (https://github.com/ansible-collections/community.aws/pull/675).
+- ec2_launch_template - Tests for compatibility with older versions of the AWS SDKs have been removed (https://github.com/ansible-collections/community.aws/pull/675).
 - ec2_lc_info - ensure module runs in check_mode (https://github.com/ansible-collections/community.aws/issues/659).
-- ec2_transit_gateway - Tests for compatability with older versions of the AWS SDKs have been removed (https://github.com/ansible-collections/community.aws/pull/675).
-- ec2_transit_gateway_info - Tests for compatability with older versions of the AWS SDKs have been removed (https://github.com/ansible-collections/community.aws/pull/675).
-- ec2_vpc_peer - Tests for compatability with older versions of the AWS SDKs have been removed (https://github.com/ansible-collections/community.aws/pull/675).
+- ec2_transit_gateway - Tests for compatibility with older versions of the AWS SDKs have been removed (https://github.com/ansible-collections/community.aws/pull/675).
+- ec2_transit_gateway_info - Tests for compatibility with older versions of the AWS SDKs have been removed (https://github.com/ansible-collections/community.aws/pull/675).
+- ec2_vpc_peer - Tests for compatibility with older versions of the AWS SDKs have been removed (https://github.com/ansible-collections/community.aws/pull/675).
 - ec2_vpc_peer - use shared code for tagging peering connections (https://github.com/ansible-collections/community.aws/pull/614).
 - ec2_vpc_route_table - use shared code for tagging route tables (https://github.com/ansible-collections/community.aws/pull/616).
 - ec2_vpc_vgw - fix arguments-renamed pylint issue (https://github.com/ansible-collections/community.aws/pull/686).
 - ec2_vpc_vpn - fix arguments-renamed pylint issue (https://github.com/ansible-collections/community.aws/pull/686).
-- ecs_ecr - Tests for compatability with older versions of the AWS SDKs have been removed (https://github.com/ansible-collections/community.aws/pull/675).
-- ecs_service - Tests for compatability with older versions of the AWS SDKs have been removed (https://github.com/ansible-collections/community.aws/pull/675).
-- ecs_task - Tests for compatability with older versions of the AWS SDKs have been removed (https://github.com/ansible-collections/community.aws/pull/675).
+- ecs_ecr - Tests for compatibility with older versions of the AWS SDKs have been removed (https://github.com/ansible-collections/community.aws/pull/675).
+- ecs_service - Tests for compatibility with older versions of the AWS SDKs have been removed (https://github.com/ansible-collections/community.aws/pull/675).
+- ecs_task - Tests for compatibility with older versions of the AWS SDKs have been removed (https://github.com/ansible-collections/community.aws/pull/675).
 - ecs_task - remove unused import (https://github.com/ansible-collections/community.aws/pull/686).
-- ecs_taskdefinition - Tests for compatability with older versions of the AWS SDKs have been removed (https://github.com/ansible-collections/community.aws/pull/675).
-- efs - Tests for compatability with older versions of the AWS SDKs have been removed (https://github.com/ansible-collections/community.aws/pull/675).
-- efs_info - Tests for compatability with older versions of the AWS SDKs have been removed (https://github.com/ansible-collections/community.aws/pull/675).
+- ecs_taskdefinition - Tests for compatibility with older versions of the AWS SDKs have been removed (https://github.com/ansible-collections/community.aws/pull/675).
+- efs - Tests for compatibility with older versions of the AWS SDKs have been removed (https://github.com/ansible-collections/community.aws/pull/675).
+- efs_info - Tests for compatibility with older versions of the AWS SDKs have been removed (https://github.com/ansible-collections/community.aws/pull/675).
 - elasticache_subnet_group - add return values (https://github.com/ansible-collections/community.aws/pull/723).
 - elasticache_subnet_group - add support for check_mode (https://github.com/ansible-collections/community.aws/pull/723).
 - elasticache_subnet_group - module migrated to boto3 AWS SDK (https://github.com/ansible-collections/community.aws/pull/723).
@@ -802,25 +1156,25 @@ Minor Changes
 - elb_application_lb_info - added ``ip_address_type`` in output when gathering application load balancer parameters (https://github.com/ansible-collections/community.aws/pull/499).
 - elb_instance - make elb_instance idempotent when deregistering instances.  Merged from ec2_elb U(https://github.com/ansible/ansible/pull/31660).
 - elb_network_lb - added ``ip_address_type`` parameter to support changing network load balancer configuration (https://github.com/ansible-collections/community.aws/pull/499).
-- elb_target_group - Tests for compatability with older versions of the AWS SDKs have been removed (https://github.com/ansible-collections/community.aws/pull/675).
+- elb_target_group - Tests for compatibility with older versions of the AWS SDKs have been removed (https://github.com/ansible-collections/community.aws/pull/675).
 - elb_target_group - use a generator rather than list comprehension (https://github.com/ansible-collections/community.aws/pull/688).
 - iam - use a generator rather than list comprehension (https://github.com/ansible-collections/community.aws/pull/688).
 - iam_group - use a generator rather than list comprehension (https://github.com/ansible-collections/community.aws/pull/688).
 - iam_mfa_device_info - ensure module runs in check_mode (https://github.com/ansible-collections/community.aws/issues/659).
-- iam_role - Tests for compatability with older versions of the AWS SDKs have been removed (https://github.com/ansible-collections/community.aws/pull/675).
+- iam_role - Tests for compatibility with older versions of the AWS SDKs have been removed (https://github.com/ansible-collections/community.aws/pull/675).
 - iam_role - use a generator rather than list comprehension (https://github.com/ansible-collections/community.aws/pull/688).
 - iam_server_certificate_info - ensure module runs in check_mode (https://github.com/ansible-collections/community.aws/issues/659).
 - iam_user - use a generator rather than list comprehension (https://github.com/ansible-collections/community.aws/pull/688).
 - kms_info - added a new ``keys_attr`` parameter to continue returning the key details in the ``keys`` attribute as well as the ``kms_keys`` attribute (https://github.com/ansible-collections/community.aws/pull/648).
-- lambda - Tests for compatability with older versions of the AWS SDKs have been removed (https://github.com/ansible-collections/community.aws/pull/675).
-- rds_instance - Tests for compatability with older versions of the AWS SDKs have been removed (https://github.com/ansible-collections/community.aws/pull/675).
+- lambda - Tests for compatibility with older versions of the AWS SDKs have been removed (https://github.com/ansible-collections/community.aws/pull/675).
+- rds_instance - Tests for compatibility with older versions of the AWS SDKs have been removed (https://github.com/ansible-collections/community.aws/pull/675).
 - rds_instance - convert ``preferred_maintenance_window`` days into lowercase so changed returns properly (https://github.com/ansible-collections/community.aws/pull/516).
 - rds_instance - use a generator rather than list comprehension (https://github.com/ansible-collections/community.aws/pull/688).
 - route53 - add rate-limiting retries while waiting for changes to propagate (https://github.com/ansible-collections/community.aws/pull/564).
 - route53 - add retries on ``PriorRequestNotComplete`` errors (https://github.com/ansible-collections/community.aws/pull/564).
 - route53 - update retry ``max_delay`` setting so that it can be set above 60 seconds (https://github.com/ansible-collections/community.aws/pull/564).
 - sns_topic - Added ``topic_type`` parameter to select type of SNS topic (either FIFO or Standard) (https://github.com/ansible-collections/community.aws/pull/599).
-- sqs_queue - Tests for compatability with older versions of the AWS SDKs have been removed (https://github.com/ansible-collections/community.aws/pull/675).
+- sqs_queue - Tests for compatibility with older versions of the AWS SDKs have been removed (https://github.com/ansible-collections/community.aws/pull/675).
 - various community.aws modules - remove unused imports (https://github.com/ansible-collections/community.aws/pull/629)
 - wafv2_resources_info - ensure module runs in check_mode (https://github.com/ansible-collections/community.aws/issues/659).
 - wafv2_web_acl_info - ensure module runs in check_mode (https://github.com/ansible-collections/community.aws/issues/659).
@@ -1172,7 +1526,7 @@ Minor Changes
 - iam_role, iam_user and iam_group - the managed_policy option has been renamed to managed_policies (with an alias added)
 - iam_role, iam_user and iam_group - the purge_policy option has been renamed to purge_policies (with an alias added)
 - lambda - add a tracing_mode parameter to set the TracingConfig for AWS X-Ray. Also allow updating Lambda runtime.
-- purefa_volume - Change I(qos) parameter to I(bw_iops), but retain I(qos) as an alias for backwards compatability (https://github.com/ansible/ansible/pull/61577).
+- purefa_volume - Change I(qos) parameter to I(bw_iops), but retain I(qos) as an alias for backwards compatibility (https://github.com/ansible/ansible/pull/61577).
 - redshift - Add AWSRetry calls for errors outside our control
 - route53 - the module now has diff support.
 - sns_topic - Add backoff when we get Topic ``NotFound`` exceptions while listing the subscriptions.

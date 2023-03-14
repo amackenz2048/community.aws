@@ -1,12 +1,10 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 # Copyright: Ansible Project
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
-
-
-DOCUMENTATION = r'''
+DOCUMENTATION = r"""
 ---
 module: elb_target_group
 version_added: 1.0.0
@@ -89,6 +87,14 @@ options:
     required: false
     choices: [ 'http', 'https', 'tcp', 'tls', 'udp', 'tcp_udp', 'HTTP', 'HTTPS', 'TCP', 'TLS', 'UDP', 'TCP_UDP']
     type: str
+  protocol_version:
+    description:
+      - Specifies protocol version.
+      - The protocol_version parameter is immutable and cannot be changed when updating an elb_target_group.
+    required: false
+    choices: ['GRPC', 'HTTP1', 'HTTP2']
+    type: str
+    version_added: 5.1.0
   state:
     description:
       - Create or destroy the target group.
@@ -196,16 +202,18 @@ options:
       - The time to wait for the target group.
     default: 200
     type: int
-extends_documentation_fragment:
-  - amazon.aws.aws
-  - amazon.aws.ec2
-  - amazon.aws.tags
 
 notes:
   - Once a target group has been created, only its health check can then be modified using subsequent calls
-'''
 
-EXAMPLES = r'''
+extends_documentation_fragment:
+  - amazon.aws.common.modules
+  - amazon.aws.region.modules
+  - amazon.aws.tags
+  - amazon.aws.boto3
+"""
+
+EXAMPLES = r"""
 # Note: These examples do not set authentication details, see the AWS Guide for details.
 
 - name: Create a target group with a default health check
@@ -214,6 +222,15 @@ EXAMPLES = r'''
     protocol: http
     port: 80
     vpc_id: vpc-01234567
+    state: present
+
+- name: Create a target group with protocol_version 'GRPC'
+  community.aws.elb_target_group:
+    name: mytargetgroup
+    protocol: http
+    port: 80
+    vpc_id: vpc-01234567
+    protocol_version: GRPC
     state: present
 
 - name: Modify the target group with a custom health check
@@ -306,9 +323,9 @@ EXAMPLES = r'''
     targets:
         - Id: arn:aws:lambda:eu-central-1:123456789012:function:my-lambda-function
 
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 deregistration_delay_timeout_seconds:
     description: The amount time for Elastic Load Balancing to wait before changing the state of a deregistering target from draining to unused.
     returned: when state present
@@ -419,7 +436,7 @@ vpc_id:
     returned: when state present
     type: str
     sample: vpc-0123456
-'''
+"""
 
 import time
 
@@ -430,12 +447,13 @@ except ImportError:
 
 from ansible.module_utils.common.dict_transformations import camel_dict_to_snake_dict
 
-from ansible_collections.amazon.aws.plugins.module_utils.core import AnsibleAWSModule
-from ansible_collections.amazon.aws.plugins.module_utils.core import is_boto3_error_code
-from ansible_collections.amazon.aws.plugins.module_utils.ec2 import ansible_dict_to_boto3_tag_list
-from ansible_collections.amazon.aws.plugins.module_utils.ec2 import AWSRetry
-from ansible_collections.amazon.aws.plugins.module_utils.ec2 import boto3_tag_list_to_ansible_dict
-from ansible_collections.amazon.aws.plugins.module_utils.ec2 import compare_aws_tags
+from ansible_collections.amazon.aws.plugins.module_utils.botocore import is_boto3_error_code
+from ansible_collections.amazon.aws.plugins.module_utils.retries import AWSRetry
+from ansible_collections.amazon.aws.plugins.module_utils.tagging import ansible_dict_to_boto3_tag_list
+from ansible_collections.amazon.aws.plugins.module_utils.tagging import boto3_tag_list_to_ansible_dict
+from ansible_collections.amazon.aws.plugins.module_utils.tagging import compare_aws_tags
+
+from ansible_collections.community.aws.plugins.module_utils.modules import AnsibleCommunityAWSModule as AnsibleAWSModule
 
 
 def get_tg_attributes(connection, module, tg_arn):
@@ -566,6 +584,8 @@ def create_or_update_target_group(connection, module):
     params['TargetType'] = target_type
     if target_type != "lambda":
         params['Protocol'] = module.params.get("protocol").upper()
+        if module.params.get('protocol_version') is not None:
+            params['ProtocolVersion'] = module.params.get('protocol_version')
         params['Port'] = module.params.get("port")
         params['VpcId'] = module.params.get("vpc_id")
     tags = module.params.get("tags")
@@ -607,7 +627,11 @@ def create_or_update_target_group(connection, module):
 
             if module.params.get("successful_response_codes") is not None:
                 params['Matcher'] = {}
-                params['Matcher']['HttpCode'] = module.params.get("successful_response_codes")
+                code_key = 'HttpCode'
+                protocol_version = module.params.get('protocol_version')
+                if protocol_version is not None and protocol_version.upper() == "GRPC":
+                    code_key = 'GrpcCode'
+                params['Matcher'][code_key] = module.params.get("successful_response_codes")
 
     # Get target group
     target_group = get_target_group(connection, module)
@@ -657,11 +681,14 @@ def create_or_update_target_group(connection, module):
                 # Matcher (successful response codes)
                 # TODO: required and here?
                 if 'Matcher' in params:
-                    current_matcher_list = target_group['Matcher']['HttpCode'].split(',')
-                    requested_matcher_list = params['Matcher']['HttpCode'].split(',')
+                    code_key = 'HttpCode'
+                    if target_group['ProtocolVersion'] == 'GRPC':
+                        code_key = 'GrpcCode'
+                    current_matcher_list = target_group['Matcher'][code_key].split(',')
+                    requested_matcher_list = params['Matcher'][code_key].split(',')
                     if set(current_matcher_list) != set(requested_matcher_list):
                         health_check_params['Matcher'] = {}
-                        health_check_params['Matcher']['HttpCode'] = ','.join(requested_matcher_list)
+                        health_check_params['Matcher'][code_key] = ','.join(requested_matcher_list)
 
             try:
                 if health_check_params:
@@ -912,6 +939,7 @@ def main():
         name=dict(required=True),
         port=dict(type='int'),
         protocol=dict(choices=protocols_list),
+        protocol_version=dict(type='str', choices=['GRPC', 'HTTP1', 'HTTP2']),
         purge_tags=dict(default=True, type='bool'),
         stickiness_enabled=dict(type='bool'),
         stickiness_type=dict(),

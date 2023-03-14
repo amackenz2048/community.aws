@@ -1,15 +1,11 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
 
 # Copyright: (c) 2021, Ansible Project
 # (c) 2019, XLAB d.o.o <www.xlab.si>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
-from __future__ import (absolute_import, division, print_function)
-
-__metaclass__ = type
-
-
-DOCUMENTATION = r'''
+DOCUMENTATION = r"""
 ---
 module: s3_bucket_notification
 version_added: 1.0.0
@@ -74,6 +70,7 @@ options:
       - Version of the Lambda function.
       - Mutually exclusive with I(lambda_alias).
     type: int
+    default: 0
   events:
     description:
       - Events that will be triggering a notification. You can select multiple events to send
@@ -89,22 +86,26 @@ options:
               's3:ObjectRestore:Completed', 's3:ReducedRedundancyLostObject']
     type: list
     elements: str
+    default: []
   prefix:
     description:
       - Optional prefix to limit the notifications to objects with keys that start with matching
         characters.
     type: str
+    default: ''
   suffix:
     description:
       - Optional suffix to limit the notifications to objects with keys that end with matching
         characters.
     type: str
+    default: ''
 extends_documentation_fragment:
-  - amazon.aws.aws
-  - amazon.aws.ec2
-'''
+  - amazon.aws.common.modules
+  - amazon.aws.region.modules
+  - amazon.aws.boto3
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 ---
 # Examples adding notification target configs to a S3 bucket
 - name: Setup bucket event notification to a Lambda function
@@ -133,9 +134,9 @@ EXAMPLES = r'''
     state: absent
     event_name: on_file_add_or_remove
     bucket_name: test-bucket
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 notification_configuration:
   description: dictionary of currently applied notifications
   returned: success
@@ -153,15 +154,17 @@ notification_configuration:
       description:
       - List of current SNS notification configurations applied to the bucket.
       type: list
-'''
-
-from ansible_collections.amazon.aws.plugins.module_utils.core import AnsibleAWSModule
-from ansible_collections.amazon.aws.plugins.module_utils.ec2 import camel_dict_to_snake_dict
+"""
 
 try:
-    from botocore.exceptions import ClientError, BotoCoreError
+    from botocore.exceptions import BotoCoreError
+    from botocore.exceptions import ClientError
 except ImportError:
     pass  # will be protected by AnsibleAWSModule
+
+from ansible.module_utils.common.dict_transformations import camel_dict_to_snake_dict
+
+from ansible_collections.community.aws.plugins.module_utils.modules import AnsibleCommunityAWSModule as AnsibleAWSModule
 
 
 class AmazonBucket:

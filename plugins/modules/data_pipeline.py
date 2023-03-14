@@ -1,13 +1,10 @@
 #!/usr/bin/python
-#
+# -*- coding: utf-8 -*-
+
 # Copyright (c) 2017 Ansible Project
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
-
-
-DOCUMENTATION = r'''
+DOCUMENTATION = r"""
 ---
 module: data_pipeline
 version_added: 1.0.0
@@ -15,9 +12,6 @@ author:
   - Raghu Udiyar (@raags) <raghusiddarth@gmail.com>
   - Sloane Hertel (@s-hertel) <shertel@redhat.com>
 short_description: Create and manage AWS Datapipelines
-extends_documentation_fragment:
-  - amazon.aws.aws
-  - amazon.aws.ec2
 description:
   - Create and manage AWS Datapipelines. Creation is not idempotent in AWS, so the C(uniqueId) is created by hashing the options (minus objects)
     given to the datapipeline.
@@ -38,6 +32,7 @@ options:
   objects:
     type: list
     elements: dict
+    default: []
     description:
       - A list of pipeline object definitions, each of which is a dict that takes the keys I(id), I(name) and I(fields).
     suboptions:
@@ -76,6 +71,7 @@ options:
       - A list of parameter objects (dicts) in the pipeline definition.
     type: list
     elements: dict
+    default: []
     suboptions:
       id:
         description:
@@ -98,6 +94,7 @@ options:
       - A list of parameter values (dicts) in the pipeline definition.
     type: list
     elements: dict
+    default: []
     suboptions:
       id:
         description: The ID of the parameter value
@@ -120,10 +117,15 @@ options:
     description:
       - A dict of key:value pair(s) to add to the pipeline.
     type: dict
+    default: {}
     aliases: ['resource_tags']
-'''
+extends_documentation_fragment:
+  - amazon.aws.common.modules
+  - amazon.aws.region.modules
+  - amazon.aws.boto3
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 # Note: These examples do not set authentication details, see the AWS Guide for details.
 
 # Create pipeline
@@ -173,9 +175,9 @@ EXAMPLES = r'''
     region: us-west-2
     state: absent
 
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 changed:
   description: whether the data pipeline has been modified
   type: bool
@@ -190,7 +192,7 @@ result:
       data_pipeline will be an empty dict. The msg describes the status of the operation.
   returned: always
   type: dict
-'''
+"""
 
 import hashlib
 import json
@@ -204,8 +206,9 @@ except ImportError:
 from ansible.module_utils._text import to_text
 from ansible.module_utils.common.dict_transformations import camel_dict_to_snake_dict
 
-from ansible_collections.amazon.aws.plugins.module_utils.core import AnsibleAWSModule
-from ansible_collections.amazon.aws.plugins.module_utils.core import is_boto3_error_code
+from ansible_collections.amazon.aws.plugins.module_utils.botocore import is_boto3_error_code
+
+from ansible_collections.community.aws.plugins.module_utils.modules import AnsibleCommunityAWSModule as AnsibleAWSModule
 
 
 DP_ACTIVE_STATES = ['ACTIVE', 'SCHEDULED']

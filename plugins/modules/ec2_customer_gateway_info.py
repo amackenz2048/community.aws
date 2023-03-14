@@ -1,37 +1,38 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 # Copyright: Ansible Project
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
-
-
-DOCUMENTATION = r'''
+DOCUMENTATION = r"""
 ---
 module: ec2_customer_gateway_info
 version_added: 1.0.0
 short_description: Gather information about customer gateways in AWS
 description:
-    - Gather information about customer gateways in AWS.
-author: Madhura Naniwadekar (@Madhura-CSI)
+  - Gather information about customer gateways in AWS.
+author:
+  - Madhura Naniwadekar (@Madhura-CSI)
 options:
   filters:
     description:
       - A dict of filters to apply. Each dict item consists of a filter key and a filter value.
         See U(https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeCustomerGateways.html) for possible filters.
     type: dict
+    default: {}
   customer_gateway_ids:
     description:
       - Get details of a specific customer gateways using customer gateway ID/IDs. This value should be provided as a list.
     type: list
     elements: str
+    default: []
 extends_documentation_fragment:
-- amazon.aws.aws
-- amazon.aws.ec2
+  - amazon.aws.common.modules
+  - amazon.aws.region.modules
+  - amazon.aws.boto3
+"""
 
-'''
-
-EXAMPLES = r'''
+EXAMPLES = r"""
 # # Note: These examples do not set authentication details, see the AWS Guide for details.
 
 - name: Gather information about all customer gateways
@@ -52,9 +53,9 @@ EXAMPLES = r'''
       - 'cgw-48841a09'
       - 'cgw-fec021ce'
   register: cust_gw_info
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 customer_gateways:
     description: List of one or more customer gateways.
     returned: always
@@ -75,19 +76,22 @@ customer_gateways:
                 "type": "ipsec.1"
             }
         ]
-'''
+"""
 
 import json
+
 try:
-    from botocore.exceptions import ClientError, BotoCoreError
+    from botocore.exceptions import BotoCoreError
+    from botocore.exceptions import ClientError
 except ImportError:
     pass  # caught by AnsibleAWSModule
 
-from ansible_collections.amazon.aws.plugins.module_utils.core import AnsibleAWSModule
-from ansible_collections.amazon.aws.plugins.module_utils.ec2 import (ansible_dict_to_boto3_filter_list,
-                                                                     boto3_tag_list_to_ansible_dict,
-                                                                     camel_dict_to_snake_dict,
-                                                                     )
+from ansible.module_utils.common.dict_transformations import camel_dict_to_snake_dict
+
+from ansible_collections.amazon.aws.plugins.module_utils.transformation import ansible_dict_to_boto3_filter_list
+from ansible_collections.amazon.aws.plugins.module_utils.tagging import boto3_tag_list_to_ansible_dict
+
+from ansible_collections.community.aws.plugins.module_utils.modules import AnsibleCommunityAWSModule as AnsibleAWSModule
 
 
 def date_handler(obj):

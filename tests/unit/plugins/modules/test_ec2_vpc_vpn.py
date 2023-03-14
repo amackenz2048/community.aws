@@ -11,7 +11,6 @@ import pytest
 from ansible_collections.amazon.aws.tests.unit.utils.amazon_placebo_fixtures import placeboify  # pylint: disable=unused-import
 from ansible_collections.amazon.aws.tests.unit.utils.amazon_placebo_fixtures import maybe_sleep  # pylint: disable=unused-import
 
-import ansible_collections.amazon.aws.plugins.module_utils.modules as aws_modules
 import ansible_collections.amazon.aws.plugins.module_utils.retries as aws_retries
 from ansible_collections.amazon.aws.plugins.module_utils.ec2 import get_aws_connection_info
 from ansible_collections.amazon.aws.plugins.module_utils.ec2 import boto3_conn
@@ -87,7 +86,7 @@ def get_dependencies():
 def setup_mod_conn(placeboify, params):
     conn = placeboify.client('ec2')
     retry_decorator = aws_retries.AWSRetry.jittered_backoff()
-    wrapped_conn = aws_modules._RetryingBotoClientWrapper(conn, retry_decorator)
+    wrapped_conn = aws_retries.RetryingBotoClientWrapper(conn, retry_decorator)
     m = FakeModule(**params)
     return m, wrapped_conn
 

@@ -1,12 +1,10 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 # Copyright (c) 2017 Jon Meran <jonathan.meran@sonos.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
-
-
-DOCUMENTATION = r'''
+DOCUMENTATION = r"""
 ---
 module: batch_job_definition
 version_added: 1.0.0
@@ -78,6 +76,7 @@ options:
         see U(https://docs.docker.com/engine/reference/builder/#cmd).
     type: list
     elements: str
+    default: []
   job_role_arn:
     description:
       - The Amazon Resource Name (ARN) of the IAM role that the container can assume for AWS permissions.
@@ -104,6 +103,7 @@ options:
             allowed. This name is referenced in the sourceVolume parameter of container definition mountPoints.
     type: list
     elements: dict
+    default: []
   environment:
     description:
       - The environment variables to pass to a container. This parameter maps to Env in the Create a container section
@@ -117,6 +117,7 @@ options:
           - The value of the key value pair. For environment variables, this is the value of the environment variable.
     type: list
     elements: dict
+    default: []
   mount_points:
     description:
       - The mount points for data volumes in your container. This parameter maps to Volumes in the Create a container
@@ -134,6 +135,7 @@ options:
           - The name of the volume to mount.
     type: list
     elements: dict
+    default: []
   readonly_root_filesystem:
     description:
       - When this parameter is true, the container is given read-only access to its root file system. This parameter
@@ -162,6 +164,7 @@ options:
           - The soft limit for the ulimit type.
     type: list
     elements: dict
+    default: []
   user:
     description:
       - The user name to use inside the container. This parameter maps to User in the Create a container section of
@@ -174,11 +177,12 @@ options:
         many times.
     type: int
 extends_documentation_fragment:
-  - amazon.aws.aws
-  - amazon.aws.ec2
-'''
+  - amazon.aws.common.modules
+  - amazon.aws.region.modules
+  - amazon.aws.boto3
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 ---
 - name: My Batch Job Definition
   community.aws.batch_job_definition:
@@ -201,9 +205,9 @@ EXAMPLES = r'''
 
 - name: show results
   ansible.builtin.debug: var=job_definition_create_result
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 ---
 output:
   description: "returns what action was taken, whether something was changed, invocation and response"
@@ -217,16 +221,20 @@ output:
       status: INACTIVE
       type: container
   type: dict
-'''
-
-from ansible_collections.amazon.aws.plugins.module_utils.batch import cc, set_api_params
-from ansible_collections.amazon.aws.plugins.module_utils.core import AnsibleAWSModule
-from ansible_collections.amazon.aws.plugins.module_utils.ec2 import camel_dict_to_snake_dict
+"""
 
 try:
-    from botocore.exceptions import ClientError, BotoCoreError
+    from botocore.exceptions import BotoCoreError
+    from botocore.exceptions import ClientError
 except ImportError:
     pass  # Handled by AnsibleAWSModule
+
+from ansible.module_utils.common.dict_transformations import camel_dict_to_snake_dict
+
+from ansible_collections.amazon.aws.plugins.module_utils.batch import cc
+from ansible_collections.amazon.aws.plugins.module_utils.batch import set_api_params
+
+from ansible_collections.community.aws.plugins.module_utils.modules import AnsibleCommunityAWSModule as AnsibleAWSModule
 
 
 # ---------------------------------------------------------------------------------------------------
@@ -302,7 +310,7 @@ def create_job_definition(module, batch_client):
 
 
 def get_retry_strategy_params():
-    return 'attempts',
+    return ('attempts',)
 
 
 def get_container_property_params():

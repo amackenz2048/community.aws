@@ -4,11 +4,7 @@
 # Copyright: Ansible Project
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
-
-
-DOCUMENTATION = '''
+DOCUMENTATION = r"""
 ---
 module: api_gateway
 version_added: 1.0.0
@@ -76,6 +72,7 @@ options:
     description:
       - ENV variables for the stage. Define a dict of key values pairs for variables.
     type: dict
+    default: {}
   stage_canary_settings:
     description:
       - Canary settings for the deployment of the stage.
@@ -86,6 +83,7 @@ options:
       - 'C(useStageCache): A Boolean flag to indicate whether the canary deployment uses the stage cache or not.'
       - See docs U(https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/apigateway.html#APIGateway.Client.create_stage)
     type: dict
+    default: {}
   tracing_enabled:
     description:
       - Specifies whether active tracing with X-ray is enabled for the API GW stage.
@@ -102,18 +100,18 @@ options:
     default: EDGE
 author:
   - 'Michael De La Rue (@mikedlr)'
-extends_documentation_fragment:
-  - amazon.aws.aws
-  - amazon.aws.ec2
-
 notes:
   - A future version of this module will probably use tags or another
     ID so that an API can be created only once.
   - As an early work around an intermediate version will probably do
     the same using a tag embedded in the API name.
-'''
+extends_documentation_fragment:
+  - amazon.aws.common.modules
+  - amazon.aws.region.modules
+  - amazon.aws.boto3
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: Setup AWS API Gateway setup on AWS and deploy API definition
   community.aws.api_gateway:
     swagger_file: my_api.yml
@@ -142,9 +140,9 @@ EXAMPLES = '''
     cache_size: '6.1'
     canary_settings: { percentTraffic: 50.0, deploymentId: '123', useStageCache: True }
     state: present
-'''
+"""
 
-RETURN = '''
+RETURN = r"""
 api_id:
     description: API id of the API endpoint created
     returned: success
@@ -165,7 +163,7 @@ resource_actions:
     returned: always
     type: list
     sample: ["apigateway:CreateRestApi", "apigateway:CreateDeployment", "apigateway:PutRestApi"]
-'''
+"""
 
 import json
 import traceback
@@ -177,8 +175,9 @@ except ImportError:
 
 from ansible.module_utils.common.dict_transformations import camel_dict_to_snake_dict
 
-from ansible_collections.amazon.aws.plugins.module_utils.core import AnsibleAWSModule
-from ansible_collections.amazon.aws.plugins.module_utils.ec2 import AWSRetry
+from ansible_collections.amazon.aws.plugins.module_utils.retries import AWSRetry
+
+from ansible_collections.community.aws.plugins.module_utils.modules import AnsibleCommunityAWSModule as AnsibleAWSModule
 
 
 def main():

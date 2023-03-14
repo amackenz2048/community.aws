@@ -1,11 +1,10 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 # Copyright: Ansible Project
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
 
-
-DOCUMENTATION = '''
+DOCUMENTATION = r"""
 ---
 module: wafv2_rule_group_info
 version_added: 1.5.0
@@ -15,11 +14,6 @@ short_description: wafv2_web_acl_info
 description:
   - Get informations about existing wafv2 rule groups.
 options:
-    state:
-      description:
-        - This option does nothing, has been deprecated, and will be removed in a release after 2022-12-01.
-      required: false
-      type: str
     name:
       description:
         - The name of the rule group.
@@ -33,20 +27,19 @@ options:
       type: str
 
 extends_documentation_fragment:
-  - amazon.aws.aws
-  - amazon.aws.ec2
+  - amazon.aws.common.modules
+  - amazon.aws.region.modules
+  - amazon.aws.boto3
+"""
 
-'''
-
-EXAMPLES = '''
+EXAMPLES = r"""
 - name: rule group info
   community.aws.wafv2_rule_group_info:
     name: test02
-    state: present
     scope: REGIONAL
-'''
+"""
 
-RETURN = """
+RETURN = r"""
 arn:
     description: Rule group arn
     sample: arn:aws:wafv2:eu-central-1:11111111:regional/rulegroup/test02/6e90c01a-e4eb-43e5-b6aa-b1604cedf7d7
@@ -94,14 +87,16 @@ visibility_config:
 """
 
 try:
-    from botocore.exceptions import ClientError, BotoCoreError
+    from botocore.exceptions import BotoCoreError
+    from botocore.exceptions import ClientError
 except ImportError:
     pass  # caught by AnsibleAWSModule
 
-from ansible_collections.amazon.aws.plugins.module_utils.core import AnsibleAWSModule
-from ansible_collections.amazon.aws.plugins.module_utils.ec2 import camel_dict_to_snake_dict
-from ansible_collections.community.aws.plugins.module_utils.wafv2 import wafv2_list_rule_groups
+from ansible.module_utils.common.dict_transformations import camel_dict_to_snake_dict
+
+from ansible_collections.community.aws.plugins.module_utils.modules import AnsibleCommunityAWSModule as AnsibleAWSModule
 from ansible_collections.community.aws.plugins.module_utils.wafv2 import describe_wafv2_tags
+from ansible_collections.community.aws.plugins.module_utils.wafv2 import wafv2_list_rule_groups
 
 
 def get_rule_group(wafv2, name, scope, id, fail_json_aws):
@@ -118,7 +113,6 @@ def get_rule_group(wafv2, name, scope, id, fail_json_aws):
 
 def main():
     arg_spec = dict(
-        state=dict(type='str', required=False),
         name=dict(type='str', required=True),
         scope=dict(type='str', required=True, choices=['CLOUDFRONT', 'REGIONAL'])
     )
@@ -128,16 +122,10 @@ def main():
         supports_check_mode=True
     )
 
-    state = module.params.get("state")
     name = module.params.get("name")
     scope = module.params.get("scope")
 
     wafv2 = module.client('wafv2')
-
-    if state:
-        module.deprecate(
-            'The state parameter does nothing, has been deprecated, and will be removed in a future release.',
-            version='6.0.0', collection_name='community.aws')
 
     # check if rule group exists
     response = wafv2_list_rule_groups(wafv2, scope, module.fail_json_aws)
